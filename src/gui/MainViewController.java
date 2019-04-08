@@ -15,6 +15,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import model.services.DepartmentService;
 
 public class MainViewController implements Initializable {
 
@@ -34,7 +35,7 @@ public class MainViewController implements Initializable {
 	
 	@FXML
 	public void onMenuItemDepartmentAction() {
-		loadView("/gui/DepartmentList.fxml");
+		loadView2("/gui/DepartmentList.fxml");
 	}
 	
 	@FXML
@@ -74,6 +75,39 @@ public class MainViewController implements Initializable {
 			mainVBox.getChildren().add(mainMenu);
 			// Adiciono todos os novos itens a nova tela
 			mainVBox.getChildren().addAll(newVBox.getChildren());
+		}
+		catch (IOException e) {
+			Alerts.showAlert("IOException", "Error Load View", e.getMessage(), AlertType.ERROR);
+		}
+		
+	}
+	
+	private synchronized void loadView2(String absoluteName) {
+		try {
+			// FXMLLoader = carrega o arquivo da View.fxml
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			// Carrego a nova view em um atributo
+			VBox newVBox = loader.load();
+			
+			// Resgato a Cena Principal da View Principal do Programa
+			Scene mainScene = Main.getMainScene();
+			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
+			
+			// Resgato os itens necessários para a apresentação da nova tela dentro da Cena Principal
+			// Resgato a Barra de Menu (Principal)
+			Node mainMenu = mainVBox.getChildren().get(0);
+			// Removo todos os itens da Cena Principal
+			mainVBox.getChildren().clear();
+			// Adiciono a Barra de Menu resgatada para a nova Tela
+			mainVBox.getChildren().add(mainMenu);
+			// Adiciono todos os novos itens a nova tela
+			mainVBox.getChildren().addAll(newVBox.getChildren());
+			
+			// Pegando a referencia para o Controller da View
+			// Processo manual para injeção da dependencia
+			DepartmentListController controller = loader.getController();
+			controller.setDepartmentService(new DepartmentService());
+			controller.updateTableView();
 		}
 		catch (IOException e) {
 			Alerts.showAlert("IOException", "Error Load View", e.getMessage(), AlertType.ERROR);
