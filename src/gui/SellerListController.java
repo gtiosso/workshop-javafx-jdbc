@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import application.Main;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -28,7 +29,7 @@ import javafx.stage.Stage;
 import model.entities.Seller;
 import model.services.SellerService;
 
-public class SellerListController implements Initializable {
+public class SellerListController implements Initializable, DataChangeListener {
 
 	private SellerService service;
 	
@@ -107,7 +108,7 @@ public class SellerListController implements Initializable {
 			SellerFormController controller = loader.getController();
 			controller.setSeller(obj);
 			controller.setSellerService(service);
-			//controller.subscribeDataChangeListener(this);
+			controller.subscribeDataChangeListener(this);
 			controller.updateFormData();
 
 			// Instanciando o novo Palco para a nova Janela
@@ -134,6 +135,11 @@ public class SellerListController implements Initializable {
 	@Override
 	public void initialize(URL uri, ResourceBundle rb) {
 		initializeNodes();
+	}
+
+	@Override
+	public void onDataChanged() {
+		updateTableView();
 	}
 	
 

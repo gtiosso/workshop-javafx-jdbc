@@ -1,9 +1,12 @@
 package gui;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import db.DbException;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
@@ -24,6 +27,8 @@ public class SellerFormController implements Initializable {
 	
 	private SellerService service;
 
+	private List<DataChangeListener> dataChangeListener = new ArrayList<DataChangeListener>();
+	
 	@FXML
 	private TextField txtId;
 
@@ -74,7 +79,7 @@ public class SellerFormController implements Initializable {
 		try {
 			seller = getFormData();
 			service.saveOrUpdate(seller);
-			//notifyDataChangeListeners();
+			notifyDataChangeListeners();
 			Utils.currentStage(event).close();
 		}
 		catch (DbException e) {
@@ -150,5 +155,16 @@ public class SellerFormController implements Initializable {
 		//}
 		
 		return seller;
+	}
+	
+	public void subscribeDataChangeListener(DataChangeListener listener) {
+		dataChangeListener.add(listener);
+	}
+	
+	private void notifyDataChangeListeners() {
+		for (DataChangeListener listener : dataChangeListener) {
+			listener.onDataChanged();
+		}
+		
 	}
 }
