@@ -9,8 +9,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import model.entities.Department;
+import model.entities.Seller;
 
 public class SellerFormController implements Initializable {
+	
+	private Seller seller;
 
 	@FXML
 	private TextField txtId;
@@ -69,5 +73,20 @@ public class SellerFormController implements Initializable {
 		Constraints.setTextFieldDouble(txtBaseSalary);
 
 	}
+	
+	public void setSeller(Seller seller) {
+		this.seller = seller;
+	}
 
+	public void updateFormData() {
+		if (seller == null) {
+			throw new IllegalStateException("Seller was null!");
+		}
+		txtId.setText(String.valueOf(seller.getId()));
+		txtName.setText(String.valueOf(seller.getName()));
+		txtEmail.setText(String.valueOf(seller.getEmail()));
+		txtBirthDate.setText(String.valueOf(seller.getBirthDate()));
+		txtBaseSalary.setText(String.valueOf(seller.getBaseSalary()));
+		txtDepartment.setText(String.valueOf(seller.getDepartment()));
+	}
 }

@@ -61,7 +61,8 @@ public class SellerListController implements Initializable {
 	@FXML
 	public void onBtNewAction(ActionEvent event) {
 		Stage parentStage = Utils.currentStage(event);
-		createDialogForm("/gui/SellerForm.fxml", parentStage);
+		Seller obj = new Seller();
+		createDialogForm("/gui/SellerForm.fxml", parentStage, obj);
 	}
 	
 	// Metodo para iniciar o comportamento das colunas da TableView
@@ -97,17 +98,17 @@ public class SellerListController implements Initializable {
 		tableViewSeller.setItems(obsList);
 	}
 	
-	private void createDialogForm(String absoluteName, Stage parentStage) {
+	private void createDialogForm(String absoluteName, Stage parentStage, Seller obj) {
 		// Instanciando a janela de dialogo
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
 
-			//SellerFormController controller = loader.getController();
-			//controller.setSeller(obj);
+			SellerFormController controller = loader.getController();
+			controller.setSeller(obj);
 			//controller.setSellerService(service);
 			//controller.subscribeDataChangeListener(this);
-			//controller.updateFormData();
+			controller.updateFormData();
 
 			// Instanciando o novo Palco para a nova Janela
 			Stage dialogStage = new Stage();
