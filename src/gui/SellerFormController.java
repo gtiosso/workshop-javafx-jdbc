@@ -3,7 +3,9 @@ package gui;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import db.DbException;
 import gui.listeners.DataChangeListener;
@@ -19,16 +21,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Department;
 import model.entities.Seller;
+import model.exceptions.ValidationException;
 import model.services.SellerService;
 
 public class SellerFormController implements Initializable {
-	
+
 	private Seller seller;
-	
+
 	private SellerService service;
 
 	private List<DataChangeListener> dataChangeListener = new ArrayList<DataChangeListener>();
-	
+
 	@FXML
 	private TextField txtId;
 
@@ -81,14 +84,13 @@ public class SellerFormController implements Initializable {
 			service.saveOrUpdate(seller);
 			notifyDataChangeListeners();
 			Utils.currentStage(event).close();
-		}
-		catch (DbException e) {
+		} catch (DbException e) {
 			Alerts.showAlert("Error Saving Data", null, e.getMessage(), AlertType.ERROR);
 		}
-		//catch (ValidationException e) {
-			//setErrorMessages(e.getErrors());
-		//}
-		
+		catch (ValidationException e) {
+			setErrorMessages(e.getErrors());
+		}
+
 	}
 
 	@FXML
@@ -102,13 +104,14 @@ public class SellerFormController implements Initializable {
 		Constraints.setTextFieldMaxLength(txtName, 30);
 		Constraints.setTextFieldEmail(txtEmail);
 		Constraints.setTextFieldDouble(txtBaseSalary);
+		Constraints.setTextFieldInteger(txtDepartmentId);
 
 	}
-	
+
 	public void setSeller(Seller seller) {
 		this.seller = seller;
 	}
-	
+
 	public void setSellerService(SellerService service) {
 		this.service = service;
 	}
@@ -124,47 +127,75 @@ public class SellerFormController implements Initializable {
 		txtBaseSalary.setText(String.valueOf(seller.getBaseSalary()));
 		txtDepartmentId.setText(String.valueOf(seller.getDepartment()));
 	}
-	
+
 	private Seller getFormData() {
 		Seller seller = new Seller();
-		
+
 		// Instanciando a exceção
-		//ValidationException exception = new ValidationException("Validation Error");
-		
+		ValidationException exception = new ValidationException("Validation Error");
+
 		seller.setId(Utils.tryParseToInt(txtId.getText()));
-		
-		//if (txtName.getText() == null || txtName.getText().trim().equals("")){
-		//	exception.addError("name", "Field can not be empty");
-		//}
+
+		if (txtName.getText() == null || txtName.getText().trim().equals("")) {
+			exception.addError("name", "Field can not be empty");
+		}
 		seller.setName(txtName.getText());
-		
-		//if (txtEmail.getText() == null || txtName.getText().trim().equals("")){
-		//	exception.addError("email", "Field can not be empty");
-		//}
+
+		if (txtEmail.getText() == null || txtEmail.getText().trim().equals("")) {
+			exception.addError("email", "Field can not be empty");
+		}
 		seller.setEmail(txtEmail.getText());
-		
+
+		if (txtBirthDate.getText() == null || txtBirthDate.getText().trim().equals("")) {
+			exception.addError("birthDate", "Field can not be empty");
+		}
 		seller.setBirthDate(Utils.tryParseToDate(txtBirthDate.getText()));
-		
+
+		if (txtBaseSalary.getText() == null || txtBaseSalary.getText().trim().equals("")) {
+			exception.addError("baseSalary", "Field can not be empty");
+		}
 		seller.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));
-		
+
+		if (txtDepartmentId.getText() == null || txtDepartmentId.getText().trim().equals("")) {
+			exception.addError("departmentId", "Field can not be empty");
+		}
 		seller.setDepartment(new Department(Utils.tryParseToInt(txtDepartmentId.getText()), null));
-		
+
 		// Lançando a exceção
-		//if(exception.getErrors().size() > 0) {
-		//	throw exception;
-		//}
-		
+		if (exception.getErrors().size() > 0) {
+			throw exception;
+		}
+
 		return seller;
 	}
-	
+
 	public void subscribeDataChangeListener(DataChangeListener listener) {
 		dataChangeListener.add(listener);
 	}
-	
+
 	private void notifyDataChangeListeners() {
 		for (DataChangeListener listener : dataChangeListener) {
 			listener.onDataChanged();
 		}
-		
+	}
+
+	public void setErrorMessages(Map<String, String> errors) {
+		Set<String> fields = errors.keySet();
+
+		if (fields.contains("name")) {
+			labelErrorName.setText(errors.get("name"));
+		}
+		if (fields.contains("email")) {
+			labelErrorEmail.setText(errors.get("email"));
+		}
+		if (fields.contains("birthDate")) {
+			labelErrorBirthDate.setText(errors.get("birthDate"));
+		}
+		if (fields.contains("baseSalary")) {
+			labelErrorBaseSalary.setText(errors.get("baseSalary"));
+		}
+		if (fields.contains("departmentId")) {
+			labelErrorDepartmentId.setText(errors.get("departmentId"));
+		}
 	}
 }
