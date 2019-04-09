@@ -106,7 +106,7 @@ public class SellerListController implements Initializable {
 
 			SellerFormController controller = loader.getController();
 			controller.setSeller(obj);
-			//controller.setSellerService(service);
+			controller.setSellerService(service);
 			//controller.subscribeDataChangeListener(this);
 			controller.updateFormData();
 

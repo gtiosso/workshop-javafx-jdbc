@@ -13,4 +13,13 @@ public class SellerService {
 		
 		return dao.findAll();
 	}
+	
+	public void saveOrUpdate(Seller obj) {
+		if(obj.getId() == null) {
+			dao.insert(obj);
+		}
+		else {
+			dao.update(obj);
+		}
+	}
 }
