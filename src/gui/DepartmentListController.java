@@ -1,6 +1,5 @@
 package gui;
 
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -10,6 +9,7 @@ import application.Main;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -32,79 +33,82 @@ public class DepartmentListController implements Initializable, DataChangeListen
 
 	// Criando dependencia do serviço
 	private DepartmentService service;
-	
+
 	@FXML
 	private TableView<Department> tableViewDepartment;
-	
+
 	@FXML
 	private TableColumn<Department, Integer> tableColumnId;
-	
+
 	@FXML
 	private TableColumn<Department, String> tableColumnName;
-	
+
+	@FXML
+	private TableColumn<Department, Department> tableColumnEDIT;
+
 	@FXML
 	private Button btNew;
-	
+
 	private ObservableList<Department> obsList;
-	
-	
-	// ActionEvent = criando uma referencia para o controle que recebeu o evento 
+
+	// ActionEvent = criando uma referencia para o controle que recebeu o evento
 	@FXML
 	public void onBtNewAction(ActionEvent event) {
 		Stage parentStage = Utils.currentStage(event);
 		Department department = new Department();
 		createDialogForm("/gui/DepartmentForm.fxml", parentStage, department);
 	}
-	
+
 	// Criando acoplamento fraco, com injeção de dependencia e inversão de controle
 	// Não fazendo a instanciação direta na classe.
 	public void setDepartmentService(DepartmentService service) {
 		this.service = service;
 	}
-	
+
 	@Override
 	public void initialize(URL uri, ResourceBundle rb) {
 		initializeNodes();
-		
+
 	}
 
 	// Metodo para iniciar o comportamento das colunas da TableView
 	private void initializeNodes() {
 		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
-		
-		// Pegando a referencia do Stage Principal, 
+
+		// Pegando a referencia do Stage Principal,
 		// atraves de um Downcasting da SuperClasse Window para a Classe Stage
 		Stage stage = (Stage) Main.getMainScene().getWindow();
-		
+
 		// Redimensionando tamanho da TableView para acompnhar a tela principal
 		tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
-		
+
 	}
-	
+
 	public void updateTableView() {
 		// Garantindo a instanciação do Serviço
 		if (service == null) {
 			throw new IllegalStateException("Service was null!");
 		}
-		
+
 		List<Department> list = service.findAll();
 		obsList = FXCollections.observableArrayList(list);
 		tableViewDepartment.setItems(obsList);
+		initEditButtons();
 	}
-	
+
 	private void createDialogForm(String absoluteName, Stage parentStage, Department obj) {
 		// Instanciando a janela de dialogo
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
-			
+
 			DepartmentFormController controller = loader.getController();
 			controller.setDepartment(obj);
 			controller.setDepartmentService(service);
 			controller.subscribeDataChangeListener(this);
 			controller.updateFormData();
-			
+
 			// Instanciando o novo Palco para a nova Janela
 			Stage dialogStage = new Stage();
 			// Declarando o Titulo da nova Janela
@@ -120,9 +124,8 @@ public class DepartmentListController implements Initializable, DataChangeListen
 			// nas demais janelas
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.showAndWait();
-			
-		}
-		catch (IOException e) {
+
+		} catch (IOException e) {
 			Alerts.showAlert("Exception", "Error Load View", e.getMessage(), AlertType.ERROR);
 		}
 	}
@@ -130,7 +133,25 @@ public class DepartmentListController implements Initializable, DataChangeListen
 	@Override
 	public void onDataChanged() {
 		updateTableView();
-		
+	}
+
+	private void initEditButtons() {
+		tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+		tableColumnEDIT.setCellFactory(param -> new TableCell<Department, Department>() {
+			private final Button button = new Button("edit");
+
+			@Override
+			protected void updateItem(Department obj, boolean empty) {
+				super.updateItem(obj, empty);
+				if (obj == null) {
+					setGraphic(null);
+					return;
+				}
+				setGraphic(button);
+				button.setOnAction(
+						event -> createDialogForm("/gui/DepartmentForm.fxml", Utils.currentStage(event), obj));
+			}
+		});
 	}
 
 }
