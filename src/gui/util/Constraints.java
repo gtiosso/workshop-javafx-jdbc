@@ -22,7 +22,15 @@ public class Constraints {
 
 	public static void setTextFieldEmail(TextField txt) {
 		txt.textProperty().addListener((obs, oldValue, newValue) -> {
-		    	if (newValue != null && !newValue.matches("[a-z0-9]*([\\.\\-])?([a-z0-9]*)?(\\@)?([a-z]*)?([\\.][a-z]*)?")) {
+		    	if (newValue != null && !newValue.matches("[a-z0-9]*([\\.\\-][a-z0-9]*)?([\\@][a-z0-9]*)?([\\.][a-z]*)?([\\.][a-z]*)?")) {
+                    txt.setText(oldValue);
+                }
+		    });
+	}
+	
+	public static void setTextFieldDate(TextField txt) {
+		txt.textProperty().addListener((obs, oldValue, newValue) -> {
+		    	if (newValue != null && !newValue.matches("\\d*([\\/]\\d*)?([\\/]\\d*)?")) {
                     txt.setText(oldValue);
                 }
 		    });

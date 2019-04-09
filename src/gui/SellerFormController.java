@@ -103,6 +103,8 @@ public class SellerFormController implements Initializable {
 		Constraints.setTextFieldInteger(txtId);
 		Constraints.setTextFieldMaxLength(txtName, 30);
 		Constraints.setTextFieldEmail(txtEmail);
+		Constraints.setTextFieldDate(txtBirthDate);
+		Constraints.setTextFieldMaxLength(txtBirthDate, 10);
 		Constraints.setTextFieldDouble(txtBaseSalary);
 		Constraints.setTextFieldInteger(txtDepartmentId);
 
