@@ -125,7 +125,12 @@ public class SellerFormController implements Initializable {
 		txtEmail.setText(String.valueOf(seller.getEmail()));
 		txtBirthDate.setText(String.valueOf(seller.getBirthDate()));
 		txtBaseSalary.setText(String.valueOf(seller.getBaseSalary()));
-		txtDepartmentId.setText(String.valueOf(seller.getDepartment()));
+		if(seller.getId() == null) {
+			txtDepartmentId.setText(String.valueOf(seller.getDepartment()));
+		}
+		else {
+			txtDepartmentId.setText(String.valueOf(seller.getDepartment().getId()));
+		}
 	}
 
 	private Seller getFormData() {

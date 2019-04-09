@@ -32,6 +32,7 @@
           <TableColumn fx:id="tableColumnBirthDate" prefWidth="91.0" text="BirthDate" />
             <TableColumn fx:id="tableColumnBaseSalary" prefWidth="92.0" text="BaseSalary" />
             <TableColumn fx:id="tableColumnDepartment" prefWidth="104.0" text="Department" />
+            <TableColumn fx:id="tableColumnEDIT" prefWidth="75.0" />
         </columns>
       </TableView>
    </children>

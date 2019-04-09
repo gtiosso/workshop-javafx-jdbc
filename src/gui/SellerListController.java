@@ -10,6 +10,7 @@ import application.Main;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +21,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -55,6 +57,9 @@ public class SellerListController implements Initializable, DataChangeListener {
 	
 	@FXML
 	private TableColumn<Seller, String> tableColumnDepartment;
+	
+	@FXML
+	private TableColumn<Seller, Seller> tableColumnEDIT;
 
 	@FXML
 	private Button btNew;
@@ -97,6 +102,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 		List<Seller> list = service.findAll();
 		obsList = FXCollections.observableArrayList(list);
 		tableViewSeller.setItems(obsList);
+		initEditButtons();
 	}
 	
 	private void createDialogForm(String absoluteName, Stage parentStage, Seller obj) {
@@ -140,6 +146,25 @@ public class SellerListController implements Initializable, DataChangeListener {
 	@Override
 	public void onDataChanged() {
 		updateTableView();
+	}
+	
+	private void initEditButtons() {
+		tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+		tableColumnEDIT.setCellFactory(param -> new TableCell<Seller, Seller>() {
+			private final Button button = new Button("edit");
+
+			@Override
+			protected void updateItem(Seller obj, boolean empty) {
+				super.updateItem(obj, empty);
+				if (obj == null) {
+					setGraphic(null);
+					return;
+				}
+				setGraphic(button);
+				button.setOnAction(
+						event -> createDialogForm("/gui/SellerForm.fxml", Utils.currentStage(event), obj));
+			}
+		});
 	}
 	
 
